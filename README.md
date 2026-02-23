@@ -1,7 +1,5 @@
 # Fullstack E-Commerce Platform
 
-![Hero Image / App Screenshot](docs/images/hero-screenshot.png) <!-- Ganti link gambar ini nanti -->
-
 A modern, full-stack e-commerce web application with user authentication, product management, shopping cart, and secure checkout integration. 
 
 ## ✨ Features
