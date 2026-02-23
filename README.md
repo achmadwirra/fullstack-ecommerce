@@ -16,8 +16,7 @@ A modern, full-stack e-commerce web application with user authentication, produc
 
 | Home Page | Product Details | Shopping Cart |
 | :---: | :---: | :---: |
-| ![Home](ecommerce-frontend/docs/images/home.PNG) | ![Product](docs/images/product.png) | ![Cart](docs/images/cart.png) |
-*(Catatan: Update link gambar di atas dengan screenshot aplikasi Anda)*
+| <img src="ecommerce-frontend/docs/images/home.PNG" width="350"/> | <img src="ecommerce-frontend/docs/images/product.PNG" width="350"/> | <img src="ecommerce-frontend/docs/images/cart.PNG" width="350"/> |
 
 ## 🛠️ Tech Stack
 
