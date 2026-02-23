@@ -1,0 +1,147 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Tenant {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  users     User[]
+  products  Product[]
+  orders    Order[]
+  carts     Cart[]
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(CUSTOMER)
+  tenantId     String
+  tenant       Tenant   @relation(fields: [tenantId], references: [id])
+  createdAt    DateTime @default(now())
+  cart         Cart?
+  orders       Order[]
+}
+
+model Product {
+  id                String            @id @default(uuid())
+  name              String
+  description       String?
+  price             Float
+  stock             Int
+  lowStockThreshold Int               @default(10)
+  imageUrl          String?
+  tenantId          String
+  tenant            Tenant            @relation(fields: [tenantId], references: [id])
+  createdAt         DateTime          @default(now())
+  cartItems         CartItem[]
+  orderItems        OrderItem[]
+  stockAdjustments  StockAdjustment[]
+}
+
+model Cart {
+  id        String     @id @default(uuid())
+  userId    String     @unique
+  tenantId  String
+  tenant    Tenant     @relation(fields: [tenantId], references: [id])
+  createdAt DateTime   @default(now())
+  user      User       @relation(fields: [userId], references: [id])
+  items     CartItem[]
+}
+
+model CartItem {
+  id        String  @id @default(uuid())
+  cartId    String
+  productId String
+  quantity  Int
+  cart      Cart    @relation(fields: [cartId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@unique([cartId, productId])
+}
+
+model Order {
+  id          String      @id @default(uuid())
+  userId      String
+  tenantId    String
+  tenant      Tenant      @relation(fields: [tenantId], references: [id])
+  totalAmount Decimal
+  status      OrderStatus @default(PENDING)
+  createdAt   DateTime    @default(now())
+  user        User        @relation(fields: [userId], references: [id])
+  items       OrderItem[]
+  payment     Payment?
+}
+
+model IdempotencyKey {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  response  Json?
+  createdAt DateTime @default(now())
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String
+  productId String
+  quantity  Int
+  price     Decimal
+  order     Order   @relation(fields: [orderId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model Payment {
+  id                      String        @id @default(uuid())
+  orderId                 String        @unique
+  provider                String
+  status                  PaymentStatus @default(PENDING)
+  paymentUrl              String?
+  stripeCheckoutSessionId String?
+  createdAt               DateTime      @default(now())
+  order                   Order         @relation(fields: [orderId], references: [id])
+}
+
+model StockAdjustment {
+  id        String         @id @default(uuid())
+  productId String
+  product   Product        @relation(fields: [productId], references: [id])
+  quantity  Int
+  reason    String
+  type      AdjustmentType
+  createdBy String
+  createdAt DateTime       @default(now())
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  CUSTOMER
+}
+
+enum AdjustmentType {
+  RESTOCK
+  ADJUSTMENT
+  SALE
+  CANCELLATION
+}
